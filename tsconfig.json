@@ -1,0 +1,15 @@
+{
+    "include": ["src/**/*"],
+    "compilerOptions": {
+      "module": "CommonJS",
+      "esModuleInterop": true,
+      "target": "es2022",
+      "moduleResolution": "node",
+      "sourceMap": true,
+      "outDir": "dist",
+      "rootDir": "src",
+      "declaration": true,
+      "declarationMap": true
+    },
+    "lib": ["ES2022"]
+  }
