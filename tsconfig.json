@@ -1,5 +1,6 @@
 {
     "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist", "./tests/**/*"],
     "compilerOptions": {
       "module": "CommonJS",
       "esModuleInterop": true,

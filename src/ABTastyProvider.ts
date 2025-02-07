@@ -28,13 +28,13 @@ export class AdapterLogger implements IFlagshipLogManager {
   }
 
   emergency(message: string, tag: string): void {
-    throw new Error("Method not implemented.");
+    this._logger.error(`[${tag}] : ${message}`);
   }
   alert(message: string, tag: string): void {
-    throw new Error("Method not implemented.");
+    this._logger.error(`[${tag}] : ${message}`);
   }
   critical(message: string, tag: string): void {
-    throw new Error("Method not implemented.");
+    this._logger.error(`[${tag}] : ${message}`);
   }
   error(message: string, tag: string): void {
     this._logger.error(`[${tag}] : ${message}`);
@@ -43,7 +43,7 @@ export class AdapterLogger implements IFlagshipLogManager {
     this._logger.warn(`[${tag}] : ${message}`);
   }
   notice(message: string, tag: string): void {
-    throw new Error("Method not implemented.");
+    this._logger.warn(`[${tag}] : ${message}`);
   }
   info(message: string, tag: string): void {
     this._logger.info(`[${tag}] : ${message}`);
@@ -52,7 +52,7 @@ export class AdapterLogger implements IFlagshipLogManager {
     this._logger.debug(`[${tag}] : ${message}`);
   }
   log(level: LogLevel, message: string, tag: string): void {
-    throw new Error("Method not implemented.");
+    this._logger.debug(`[${tag}] : ${message}`);
   }
 }
 
@@ -60,10 +60,6 @@ export class AdapterLogger implements IFlagshipLogManager {
  * The `ABTastyProvider` is an OpenFeature `Provider` implementation for the AB Tasty SDK.
  */
 export class ABTastyProvider implements Provider {
-  static getClient() {
-    throw new Error("Method not implemented.");
-  }
-
   readonly runsOn = "server";
   readonly hooks: Hook[] = [];
   public readonly events = new OpenFeatureEventEmitter();
@@ -89,7 +85,17 @@ export class ABTastyProvider implements Provider {
   ) {
     this._envID = envId;
     this._apiKey = apiKey;
-    this._config = config;
+
+    if (!this._envID && !this._apiKey) {
+      throw new ProviderFatalError(
+        `ABTasty Client can not be created without envID or apiKey`
+      );
+    }
+
+    if (config) {
+      this._config = config;
+    }
+
     if (logger) {
       this._logger = new AdapterLogger(logger);
     }
@@ -136,7 +142,7 @@ export class ABTastyProvider implements Provider {
     });
   }
 
-  public getClient(): Flagship {
+  public getClient(): ABTastyClient {
     return this._client;
   }
 
@@ -148,39 +154,35 @@ export class ABTastyProvider implements Provider {
     await this._client.close();
   }
 
+  public getConfig(): IFlagshipConfig {
+    return this._client.getConfig();
+  }
+
   async initialize(context?: EvaluationContext | undefined): Promise<void> {
-    try {
-      this._client = await Flagship.start(this._envID, this._apiKey, {
-        ...this._config,
-        logManager: this._logger,
-        fetchNow: false,
-      } as any);
+    this._client = await Flagship.start(this._envID, this._apiKey, {
+      ...this._config,
+      logManager: this._logger,
+      fetchNow: false,
+    } as any);
 
-      this._visitor = this._client.newVisitor({
-        isAuthenticated: true,
-        hasConsented: true,
-        visitorId: context.targetingKey,
-        context: ToPrimitiveRecord(context),
-        onFetchFlagsStatusChanged({ status, reason }) {},
-      });
+    this._visitor = this._client.newVisitor({
+      isAuthenticated: true,
+      hasConsented: true,
+      ...(context && context.targetingKey
+        ? { visitorId: context.targetingKey }
+        : {}),
+      ...(context ? { context: ToPrimitiveRecord(context) } : {}),
+      onFetchFlagsStatusChanged({ status, reason }) {},
+    });
 
-      const status = this._client.getStatus();
-      if (status == FSSdkStatus.SDK_INITIALIZED) {
-        this._visitor.updateContext(ToPrimitiveRecord(context));
-        await this._visitor.fetchFlags();
-        this.resolver = new ABTastyResolver(this._visitor);
-        this.events.emit(ProviderEvents.Ready);
-      } else {
-        this.events.emit(ProviderEvents.Error);
-      }
-    } catch (error) {
-      this.events.emit(ProviderEvents.Error);
-      if (error instanceof Error) {
-        throw new ProviderFatalError(
-          `Flagship client failed to initialize: ${error.message}`
-        );
-      }
-      throw new ProviderFatalError(`Flagship client failed to initialize`);
+    const status = this._client.getStatus();
+
+    if (context) {
+      this._visitor.updateContext(ToPrimitiveRecord(context));
     }
+
+    await this._visitor.fetchFlags();
+    this.resolver = new ABTastyResolver(this._visitor);
+    this.events.emit(ProviderEvents.Ready);
   }
 }

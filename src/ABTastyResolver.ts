@@ -28,8 +28,10 @@ export class ABTastyResolver implements Resolver {
         conf.logManager = new AdapterLogger(logger);
       }
 
-      this.visitor.updateContext(ToPrimitiveRecord(context));
-      await this.visitor.fetchFlags();
+      if (this.visitor.context != ToPrimitiveRecord(context)) {
+        this.visitor.updateContext(ToPrimitiveRecord(context));
+        await this.visitor.fetchFlags();
+      }
 
       var value = this.visitor.getFlag(flagKey).getValue(defaultValue);
       var visitorID = this.visitor.visitorId;

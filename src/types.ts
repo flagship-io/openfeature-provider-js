@@ -1,7 +1,6 @@
 import Flagship from "@flagship.io/js-sdk";
 import {
   EvaluationContext,
-  EvaluationContextValue,
   Logger,
   ResolutionDetails,
 } from "@openfeature/core";
@@ -12,6 +11,7 @@ export interface Resolver {
     flagKey,
     defaultValue,
     context,
+    logger,
   }: ResolveParams<T>): Promise<ResolutionDetails<T>>;
 }
 
@@ -19,7 +19,7 @@ export type ResolveParams<T> = {
   flagKey: string;
   defaultValue: T;
   context: EvaluationContext;
-  logger: Logger;
+  logger?: Logger;
 };
 
 export type ABTastyClient = Flagship;
