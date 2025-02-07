@@ -24,7 +24,7 @@ jobs:
         run: npm install
 
       - name: Run tests with coverage
-        run: npx jest --coverage
+        run: npx jest --coverage --force-exit
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

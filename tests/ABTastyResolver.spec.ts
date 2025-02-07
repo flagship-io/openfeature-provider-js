@@ -1,5 +1,5 @@
 import { Logger } from "@openfeature/server-sdk";
-import { ABTastyProvider, ABTastyResolver } from "../src";
+import { ABTastyProvider, ABTastyResolver, Flagship } from "../src";
 import { ResolveParams } from "../src/types";
 
 export enum ErrorCode {
@@ -9,10 +9,6 @@ export enum ErrorCode {
 export enum StandardResolutionReasons {
   STATIC = "STATIC",
 }
-
-export const Flagship = {
-  getConfig: jest.fn(),
-};
 
 type PartialVisitor = {
   visitorId: string;

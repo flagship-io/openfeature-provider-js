@@ -1,5 +1,4 @@
 import Flagship, {
-  FSSdkStatus,
   IFlagshipConfig,
   IFlagshipLogManager,
   LogLevel,
@@ -150,7 +149,7 @@ export class ABTastyProvider implements Provider {
     return this._visitor;
   }
 
-  async onClose(): Promise<void> {
+  async Close(): Promise<void> {
     await this._client.close();
   }
 

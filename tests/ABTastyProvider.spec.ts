@@ -11,9 +11,7 @@ import {
   CacheStrategy,
   DecisionMode,
   Flagship,
-  FSSdkStatus,
   IFlagshipConfig,
-  IFlagshipLogManager,
   LogLevel,
   Visitor,
 } from "../src";
@@ -258,7 +256,7 @@ describe("ABTastyProvider", () => {
     expect(provider.getVisitor()).toBeInstanceOf(Visitor);
   });
 
-  it("On Close", async () => {
-    await provider.onClose();
+  it("Close", async () => {
+    await provider.Close();
   });
 });
