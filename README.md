@@ -1,2 +1,3 @@
-# openfeature-node-server-poc
+# openfeature-node-server
+
 Proof of concept for Openfeature integration
