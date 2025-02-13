@@ -174,12 +174,6 @@ export class ABTastyProvider implements Provider {
       onFetchFlagsStatusChanged({ status, reason }) {},
     });
 
-    const status = this._client.getStatus();
-
-    if (context) {
-      this._visitor.updateContext(ToPrimitiveRecord(context));
-    }
-
     await this._visitor.fetchFlags();
     this.resolver = new ABTastyResolver(this._visitor);
     this.events.emit(ProviderEvents.Ready);

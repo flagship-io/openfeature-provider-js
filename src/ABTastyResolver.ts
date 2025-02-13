@@ -1,4 +1,4 @@
-import Flagship, { Visitor } from "@flagship.io/js-sdk";
+import Flagship, { FSFetchStatus, Visitor } from "@flagship.io/js-sdk";
 import { StandardResolutionReasons } from "@openfeature/core";
 import { ErrorCode, ResolutionDetails } from "@openfeature/server-sdk";
 import { AdapterLogger } from "./ABTastyProvider";
@@ -28,9 +28,12 @@ export class ABTastyResolver implements Resolver {
         conf.logManager = new AdapterLogger(logger);
       }
 
-      if (this.visitor.context != ToPrimitiveRecord(context)) {
-        this.visitor.updateContext(ToPrimitiveRecord(context));
-        await this.visitor.fetchFlags();
+      const userContext = ToPrimitiveRecord(context);
+      if (userContext) {
+        this.visitor.updateContext(userContext);
+        if (this.visitor.fetchStatus.status === FSFetchStatus.FETCH_REQUIRED) {
+          await this.visitor.fetchFlags();
+        }
       }
 
       var value = this.visitor.getFlag(flagKey).getValue(defaultValue);
@@ -41,17 +44,10 @@ export class ABTastyResolver implements Resolver {
         variant: visitorID,
       });
     } catch (exception) {
-      if (exception instanceof Error) {
-        return this.formatResolutionDetails({
-          value: defaultValue,
-          errorCode: ErrorCode.GENERAL,
-          errorMessage: exception.message,
-        });
-      }
       return this.formatResolutionDetails({
         value: defaultValue,
         errorCode: ErrorCode.GENERAL,
-        errorMessage: "An unexpected error occurred.",
+        errorMessage: exception.message,
       });
     }
   }

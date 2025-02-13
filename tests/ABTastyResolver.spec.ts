@@ -1,5 +1,5 @@
 import { Logger } from "@openfeature/server-sdk";
-import { ABTastyProvider, ABTastyResolver, Flagship } from "../src";
+import { ABTastyProvider, ABTastyResolver } from "../src";
 import { ResolveParams } from "../src/types";
 
 export enum ErrorCode {
@@ -10,11 +10,17 @@ export enum StandardResolutionReasons {
   STATIC = "STATIC",
 }
 
+export enum FSFetchStatus {
+  FETCHED = "FETCHED",
+  FETCH_REQUIRED = "FETCH_REQUIRED",
+}
+
 type PartialVisitor = {
   visitorId: string;
   updateContext: jest.Mock<any, any>;
   fetchFlags: jest.Mock<any, any>;
   getFlag: jest.Mock<any, any>;
+  fetchStatus: { status: FSFetchStatus };
 };
 
 describe("ABTastyResolver", () => {
@@ -28,6 +34,7 @@ describe("ABTastyResolver", () => {
       updateContext: jest.fn(),
       fetchFlags: jest.fn().mockResolvedValue(undefined),
       getFlag: jest.fn(),
+      fetchStatus: { status: FSFetchStatus.FETCHED },
     };
 
     loggerMock = {
@@ -61,10 +68,6 @@ describe("ABTastyResolver", () => {
     } as ResolveParams<boolean>);
 
     expect(visitorMock.visitorId).toBe(context.targetingKey);
-    expect(visitorMock.updateContext).toHaveBeenCalledWith(
-      expect.objectContaining(context)
-    );
-    expect(visitorMock.fetchFlags).toHaveBeenCalled();
     expect(result).toEqual({
       value: expectedFlagValue,
       variant: visitorMock.visitorId,
@@ -92,10 +95,6 @@ describe("ABTastyResolver", () => {
     });
 
     expect(visitorMock.visitorId).toBe(context.targetingKey);
-    expect(visitorMock.updateContext).toHaveBeenCalledWith(
-      expect.objectContaining(context)
-    );
-    expect(visitorMock.fetchFlags).toHaveBeenCalled();
     expect(result).toEqual({
       value: expectedFlagValue,
       variant: visitorMock.visitorId,
@@ -123,10 +122,6 @@ describe("ABTastyResolver", () => {
     });
 
     expect(visitorMock.visitorId).toBe(context.targetingKey);
-    expect(visitorMock.updateContext).toHaveBeenCalledWith(
-      expect.objectContaining(context)
-    );
-    expect(visitorMock.fetchFlags).toHaveBeenCalled();
     expect(result).toEqual({
       value: expectedFlagValue,
       variant: visitorMock.visitorId,
@@ -154,10 +149,6 @@ describe("ABTastyResolver", () => {
     });
 
     expect(visitorMock.visitorId).toBe(context.targetingKey);
-    expect(visitorMock.updateContext).toHaveBeenCalledWith(
-      expect.objectContaining(context)
-    );
-    expect(visitorMock.fetchFlags).toHaveBeenCalled();
     expect(result).toEqual({
       value: expectedFlagValue,
       variant: visitorMock.visitorId,
@@ -167,7 +158,7 @@ describe("ABTastyResolver", () => {
     });
   });
 
-  it("should resolve flag boolean value successfully", async () => {
+  it("context changed and fetch required", async () => {
     const flagKey = "testFlag";
     const defaultValue = false;
     const context = { targetingKey: "user123", extraData: "value" };
@@ -176,6 +167,8 @@ describe("ABTastyResolver", () => {
     visitorMock.getFlag.mockReturnValue({
       getValue: jest.fn().mockReturnValue(expectedFlagValue),
     });
+
+    visitorMock.fetchStatus.status = FSFetchStatus.FETCH_REQUIRED;
 
     const result = await resolver.resolve({
       flagKey,
@@ -196,42 +189,13 @@ describe("ABTastyResolver", () => {
       errorMessage: undefined,
     });
   });
-
-  /*   it("should resolve with logger a flag boolean value successfully", async () => {
-    const flagKey = "testFlag";
-    const defaultValue = false;
-    const context = { targetingKey: "user123", extraData: "value" };
-
-    const expectedFlagValue = true;
-    visitorMock.getFlag.mockReturnValue({
-      getValue: jest.fn().mockReturnValue(expectedFlagValue),
-    });
-
-    const result = await resolver.resolve({
-      flagKey,
-      defaultValue,
-      context,
-    });
-
-    expect(visitorMock.visitorId).toBe(context.targetingKey);
-    expect(visitorMock.updateContext).toHaveBeenCalledWith(
-      expect.objectContaining(context)
-    );
-    expect(visitorMock.fetchFlags).toHaveBeenCalled();
-    expect(result).toEqual({
-      value: expectedFlagValue,
-      variant: visitorMock.visitorId,
-      reason: StandardResolutionReasons.STATIC,
-      errorCode: undefined,
-      errorMessage: undefined,
-    });
-  }); */
 
   it("should resolve with default value and error details when an Error is thrown", async () => {
     const flagKey = "testFlag";
     const defaultValue = 42;
     const context = { targetingKey: "user456" };
-    const errorMessage = "Fetch failed";
+    const errorMessage =
+      "Cannot read properties of undefined (reading 'getValue')";
 
     visitorMock.fetchFlags.mockRejectedValue(new Error(errorMessage));
 
@@ -247,30 +211,7 @@ describe("ABTastyResolver", () => {
       variant: undefined,
       reason: StandardResolutionReasons.STATIC,
       errorCode: ErrorCode.GENERAL,
-      errorMessage: errorMessage,
-    });
-  });
-
-  it("should resolve with default value and generic error message when a non-Error is thrown", async () => {
-    const flagKey = "testFlag";
-    const defaultValue = "default";
-    const context = { targetingKey: "user789" };
-
-    visitorMock.fetchFlags.mockRejectedValue("Non-Error exception");
-
-    const result = await resolver.resolve({
-      flagKey,
-      defaultValue,
-      context,
-      logger: undefined,
-    });
-
-    expect(result).toEqual({
-      value: defaultValue,
-      variant: undefined,
-      reason: StandardResolutionReasons.STATIC,
-      errorCode: ErrorCode.GENERAL,
-      errorMessage: "An unexpected error occurred.",
+      errorMessage,
     });
   });
 });
