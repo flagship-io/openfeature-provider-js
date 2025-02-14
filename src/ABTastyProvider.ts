@@ -149,7 +149,7 @@ export class ABTastyProvider implements Provider {
     return this._visitor;
   }
 
-  async Close(): Promise<void> {
+  async close(): Promise<void> {
     await this._client.close();
   }
 

@@ -257,6 +257,6 @@ describe("ABTastyProvider", () => {
   });
 
   it("Close", async () => {
-    await provider.Close();
+    await provider.close();
   });
 });
