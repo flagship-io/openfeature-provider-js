@@ -18,7 +18,7 @@ export interface Resolver {
 export type ResolveParams<T> = {
   flagKey: string;
   defaultValue: T;
-  context: EvaluationContext;
+  context: FlagshipContext;
   logger?: Logger;
 };
 
@@ -29,4 +29,13 @@ export type ResolutionDetailsParams<T> = {
   variant?: string;
   errorCode?: ErrorCode;
   errorMessage?: string;
+};
+
+export type VisitorInfo = {
+  hasConsented: boolean;
+  isAuthenticated?: boolean;
+};
+
+export type FlagshipContext = EvaluationContext & {
+  fsVisitorInfo: VisitorInfo;
 };

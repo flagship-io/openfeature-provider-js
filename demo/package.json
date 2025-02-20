@@ -1,0 +1,11 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@flagship.io/openfeature-node-server": "../",
+    "@openfeature/server-sdk": "^1.17.1",
+    "express": "^4.21.2"
+  }
+}
