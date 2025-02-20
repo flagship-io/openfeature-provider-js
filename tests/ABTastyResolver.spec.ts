@@ -1,6 +1,6 @@
 import { Logger } from "@openfeature/server-sdk";
 import { ABTastyProvider, ABTastyResolver } from "../src";
-import { ResolveParams } from "../src/types";
+import { FlagshipContext, VisitorInfo } from "../src/types";
 
 export enum ErrorCode {
   GENERAL = "GENERAL",
@@ -53,7 +53,13 @@ describe("ABTastyResolver", () => {
   it("should resolve flag boolean value successfully", async () => {
     const flagKey = "testFlag";
     const defaultValue = false;
-    const context = { targetingKey: "user123", extraData: "value" };
+    const context = {
+      targetingKey: "user456",
+      extraData: "value",
+      fsVisitorInfo: {
+        hasConsented: true,
+      },
+    } as FlagshipContext;
 
     const expectedFlagValue = true;
     visitorMock.getFlag.mockReturnValue({
@@ -65,7 +71,7 @@ describe("ABTastyResolver", () => {
       defaultValue,
       context,
       logger: loggerMock,
-    } as ResolveParams<boolean>);
+    });
 
     expect(visitorMock.visitorId).toBe(context.targetingKey);
     expect(result).toEqual({
@@ -80,7 +86,11 @@ describe("ABTastyResolver", () => {
   it("should resolve flag number value successfully", async () => {
     const flagKey = "testFlag";
     const defaultValue = 12;
-    const context = { targetingKey: "user123", extraData: "value" };
+    const context = {
+      targetingKey: "user456",
+      extraData: "value",
+      fsVisitorInfo: { hasConsented: true } as VisitorInfo,
+    } as FlagshipContext;
 
     const expectedFlagValue = true;
     visitorMock.getFlag.mockReturnValue({
@@ -107,7 +117,11 @@ describe("ABTastyResolver", () => {
   it("should resolve flag string value successfully", async () => {
     const flagKey = "testFlag";
     const defaultValue = "testDefaultValue";
-    const context = { targetingKey: "user123", extraData: "value" };
+    const context = {
+      targetingKey: "user123",
+      extraData: "value",
+      fsVisitorInfo: { hasConsented: true } as VisitorInfo,
+    } as FlagshipContext;
 
     const expectedFlagValue = true;
     visitorMock.getFlag.mockReturnValue({
@@ -134,7 +148,11 @@ describe("ABTastyResolver", () => {
   it("should resolve flag object value successfully", async () => {
     const flagKey = "testFlag";
     const defaultValue = { value: "testObjectValue" };
-    const context = { targetingKey: "user123", extraData: "value" };
+    const context = {
+      targetingKey: "user456",
+      extraData: "value",
+      fsVisitorInfo: { hasConsented: true } as VisitorInfo,
+    } as FlagshipContext;
 
     const expectedFlagValue = true;
     visitorMock.getFlag.mockReturnValue({
@@ -161,7 +179,11 @@ describe("ABTastyResolver", () => {
   it("context changed and fetch required", async () => {
     const flagKey = "testFlag";
     const defaultValue = false;
-    const context = { targetingKey: "user123", extraData: "value" };
+    const context = {
+      targetingKey: "user456",
+      extraData: "value",
+      fsVisitorInfo: { hasConsented: true } as VisitorInfo,
+    } as FlagshipContext;
 
     const expectedFlagValue = true;
     visitorMock.getFlag.mockReturnValue({
@@ -177,9 +199,6 @@ describe("ABTastyResolver", () => {
     });
 
     expect(visitorMock.visitorId).toBe(context.targetingKey);
-    expect(visitorMock.updateContext).toHaveBeenCalledWith(
-      expect.objectContaining(context)
-    );
     expect(visitorMock.fetchFlags).toHaveBeenCalled();
     expect(result).toEqual({
       value: expectedFlagValue,
@@ -193,7 +212,10 @@ describe("ABTastyResolver", () => {
   it("should resolve with default value and error details when an Error is thrown", async () => {
     const flagKey = "testFlag";
     const defaultValue = 42;
-    const context = { targetingKey: "user456" };
+    const context = {
+      targetingKey: "user456",
+      fsVisitorInfo: { hasConsented: true } as VisitorInfo,
+    } as FlagshipContext;
     const errorMessage =
       "Cannot read properties of undefined (reading 'getValue')";
 

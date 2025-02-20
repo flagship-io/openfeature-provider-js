@@ -3,13 +3,18 @@ import { StandardResolutionReasons } from "@openfeature/core";
 import { ErrorCode, ResolutionDetails } from "@openfeature/server-sdk";
 import { AdapterLogger } from "./ABTastyProvider";
 import { ToPrimitiveRecord } from "./functions";
-import { ResolutionDetailsParams, ResolveParams, Resolver } from "./types";
+import {
+  ResolutionDetailsParams,
+  ResolveParams,
+  Resolver,
+  VisitorInfo,
+} from "./types";
 
 export class ABTastyResolver implements Resolver {
-  private visitor: Visitor;
+  private _visitor: Visitor;
 
   constructor(visitor: Visitor) {
-    this.visitor = visitor;
+    this._visitor = visitor;
   }
 
   async resolve<T>({
@@ -19,8 +24,10 @@ export class ABTastyResolver implements Resolver {
     logger,
   }: ResolveParams<T>): Promise<ResolutionDetails<T>> {
     try {
-      if (context.targetingKey) {
-        this.visitor.visitorId = context.targetingKey;
+      const { targetingKey, ...userContext } = context;
+
+      if (targetingKey) {
+        this._visitor.visitorId = context.targetingKey;
       }
 
       if (logger) {
@@ -28,16 +35,16 @@ export class ABTastyResolver implements Resolver {
         conf.logManager = new AdapterLogger(logger);
       }
 
-      const userContext = ToPrimitiveRecord(context);
-      if (userContext) {
-        this.visitor.updateContext(userContext);
-        if (this.visitor.fetchStatus.status === FSFetchStatus.FETCH_REQUIRED) {
-          await this.visitor.fetchFlags();
+      const primitiveVisitorContext = ToPrimitiveRecord(userContext);
+      if (primitiveVisitorContext) {
+        this._visitor.updateContext(primitiveVisitorContext);
+        if (this._visitor.fetchStatus.status === FSFetchStatus.FETCH_REQUIRED) {
+          await this._visitor.fetchFlags();
         }
       }
 
-      var value = this.visitor.getFlag(flagKey).getValue(defaultValue);
-      var visitorID = this.visitor.visitorId;
+      var value = this._visitor.getFlag(flagKey).getValue(defaultValue);
+      var visitorID = this._visitor.visitorId;
 
       return this.formatResolutionDetails({
         value: value as T,

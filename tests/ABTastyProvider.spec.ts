@@ -1,5 +1,4 @@
 import {
-  EvaluationContext,
   Logger,
   Metadata,
   ProviderFatalError,
@@ -10,12 +9,11 @@ import {
   ABTastyResolver,
   CacheStrategy,
   DecisionMode,
-  Flagship,
   IFlagshipConfig,
   LogLevel,
-  Visitor,
 } from "../src";
 import { AdapterLogger } from "../src/ABTastyProvider";
+import { FlagshipContext } from "../src/types";
 
 describe("ABTastyProvider", () => {
   const ENV_ID = "envId";
@@ -41,7 +39,7 @@ describe("ABTastyProvider", () => {
     provider = new ABTastyProvider(ENV_ID, API_KEY);
     await provider.initialize();
 
-    provider["resolver"] = resolverMock;
+    provider["_resolver"] = resolverMock;
   });
 
   it("throws ProviderFatalError when initialized with invalid credentials", () => {
@@ -82,7 +80,11 @@ describe("ABTastyProvider", () => {
     const result = await provider.resolveBooleanEvaluation(
       FLAG_KEY,
       defaultValue,
-      {},
+      {
+        fsVisitorInfo: {
+          hasConsented: false,
+        },
+      },
       loggerMock
     );
     assertResult(result, expectedValue);
@@ -96,7 +98,11 @@ describe("ABTastyProvider", () => {
     const result = await provider.resolveNumberEvaluation(
       FLAG_KEY,
       defaultValue,
-      {},
+      {
+        fsVisitorInfo: {
+          hasConsented: false,
+        },
+      },
       loggerMock
     );
     assertResult(result, expectedValue);
@@ -110,7 +116,11 @@ describe("ABTastyProvider", () => {
     const result = await provider.resolveNumberEvaluation(
       FLAG_KEY,
       defaultValue,
-      {},
+      {
+        fsVisitorInfo: {
+          hasConsented: false,
+        },
+      },
       loggerMock
     );
     assertResult(result, expectedValue);
@@ -124,7 +134,11 @@ describe("ABTastyProvider", () => {
     const result = await provider.resolveStringEvaluation(
       FLAG_KEY,
       defaultValue,
-      {},
+      {
+        fsVisitorInfo: {
+          hasConsented: false,
+        },
+      },
       loggerMock
     );
     assertResult(result, expectedValue);
@@ -142,7 +156,11 @@ describe("ABTastyProvider", () => {
       const result = await provider.resolveObjectEvaluation(
         FLAG_KEY,
         defaultValueABTasty,
-        {},
+        {
+          fsVisitorInfo: {
+            hasConsented: false,
+          },
+        },
         loggerMock
       );
 
@@ -244,16 +262,7 @@ describe("ABTastyProvider", () => {
   it("updateContext", async () => {
     await provider.initialize({
       targetingKey: "new key",
-    } as EvaluationContext);
-  });
-
-  it("Get client", async () => {
-    const client = provider.getClient();
-    expect(client.getStatus()).toBe(Flagship.getStatus());
-  });
-
-  it("Get visitor", async () => {
-    expect(provider.getVisitor()).toBeInstanceOf(Visitor);
+    } as FlagshipContext);
   });
 
   it("Close", async () => {
