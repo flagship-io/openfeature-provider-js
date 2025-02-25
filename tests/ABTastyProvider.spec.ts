@@ -52,7 +52,7 @@ describe("ABTastyProvider", () => {
 
   it("returns correct metadata from getMetadata", () => {
     const metadata: Metadata = provider.metadata;
-    expect(metadata.name).toBe("abtasty-node-provider");
+    expect(metadata.name).toBe("ABTasty");
   });
 
   const setupResolverMock = (expectedValue: any): void => {
