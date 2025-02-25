@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@flagship.io/openfeature-node-server": "../",
+    "@flagship.io/openfeature-provider-js": "../",
     "@openfeature/server-sdk": "^1.17.1",
     "express": "^4.21.2"
   }

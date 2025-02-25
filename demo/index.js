@@ -3,7 +3,7 @@
 const express = require("express");
 const {
     ABTastyProvider,
-} = require("@flagship.io/openfeature-node-server");
+} = require("@flagship.io/openfeature-provider-js");
 const { OpenFeature } = require("@openfeature/server-sdk");
 
 const app = express();
