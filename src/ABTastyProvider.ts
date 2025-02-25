@@ -64,7 +64,7 @@ export class ABTastyProvider implements Provider {
   private readonly _logger: AdapterLogger;
 
   readonly metadata: ProviderMetadata = {
-    name: "abtasty-node-provider",
+    name: "ABTasty",
   };
 
   private _envID: string;
