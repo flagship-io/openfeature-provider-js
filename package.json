@@ -11,7 +11,7 @@
   "homepage": "https://github.com/flagship-io/openfeature-provider-js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/flagship-io/openfeature-provider-js.git"
+    "url": "git+https://github.com/flagship-io/openfeature-provider-js.git"
   },
   "scripts": {
     "test": "jest",
