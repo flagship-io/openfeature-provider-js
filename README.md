@@ -1,5 +1,8 @@
 # AB Tasty OpenFeature Provider for NodeJS
 
+> [!WARNING]
+> This is a beta version, it may still contain some bugs and imperfections and should not be considered ready for production.
+
 ## Overview
 
 This Provider allow the use of OpenFeature with Flagship, the platform to run experiments across all channels and devices and let the teams continuously optimize their product without risk in order to build better experiences and unlock new revenue opportunities.
