@@ -49,6 +49,73 @@ const context: EvaluationContext = {
 const boolValue = await client.getBooleanValue("boolFlag", false, context);
 ```
 
+### Server environment
+
+:warning: When running your server in a TypeScript environment, it's essential to call setProviderAndWait within each endpoint to ensure that every request creates a new visitor context with up-to-date feature flag values. This method initializes a new visitor—using the provided targeting key and any additional context—and fetches the latest flag configurations before any flag evaluations occur. Without this step, subsequent requests might operate on outdated visitor data, leading to inconsistent or stale flag evaluations.
+
+An example of this implementation
+
+```js
+// Step 1: Start the OpenFeature SDK by providing the environment ID and API key
+let provider = new ABTastyProvider("<ENV_ID>", "<API_KEY>");
+
+const client = OpenFeature.getClient();
+
+// Endpoint to get an item
+app.get("/item", async (req, res) => {
+  // Step 2: Create a new evaluation with a targeting key (visitor ID) and visitor context
+  const evaluationContext = {
+    targetingKey: visitorId,
+    fs_is_vip: true,
+  };
+
+  // Step 3: Set context for OpenFeature instance
+  OpenFeature.setContext(evaluationContext);
+
+  // Step 4: Set Flagship SDK as provider
+  await OpenFeature.setProviderAndWait(provider);
+
+  // Step 5: Get the values of the flags for the visitor
+  const fsEnableDiscountValue = await client.getBooleanValue(
+    "fs_enable_discount",
+    false,
+    evaluationContext
+  );
+  const fsAddToCartBtnColorValue = await client.getStringValue(
+    "fs_add_to_cart_btn_color",
+    "blue",
+    evaluationContext
+  );
+  const flagNumberValue = await client.getNumberValue(
+    "flag_number",
+    0,
+    evaluationContext
+  );
+  const flagObjectValue = await client.getObjectValue(
+    "flag_object",
+    {},
+    evaluationContext
+  );
+  const flagArrayValue = await client.getObjectValue(
+    "flag_array",
+    [],
+    evaluationContext
+  );
+
+  res.json({
+    item: {
+      name: "Flagship T-shirt",
+      price: 20,
+    },
+    fsEnableDiscount: fsEnableDiscountValue,
+    fsAddToCartBtnColor: fsAddToCartBtnColorValue,
+    flagNumberValue: flagNumberValue,
+    flagObjectValue: flagObjectValue,
+    flagArrayValue: flagArrayValue,
+  });
+});
+```
+
 ## Contributing
 
 Please read our [contributing guide](./CONTRIBUTING.md).
