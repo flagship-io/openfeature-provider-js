@@ -51,7 +51,7 @@ const boolValue = await client.getBooleanValue("boolFlag", false, context);
 
 ### Server environment
 
-:warning: When running your server in a TypeScript environment, it's essential to call setProviderAndWait within each endpoint to ensure that every request creates a new visitor context with up-to-date feature flag values. This method initializes a new visitor—using the provided targeting key and any additional context—and fetches the latest flag configurations before any flag evaluations occur. Without this step, subsequent requests might operate on outdated visitor data, leading to inconsistent or stale flag evaluations.
+:warning: When running your server in a TypeScript environment, it's essential to call setProviderAndWait within each endpoint to ensure that every request creates a new visitor context with up-to-date feature flag values. This method initializes a new visitor—using the provided targeting key and any additional context—and fetches the latest flag configurations before any flag evaluations occur. Without this step, subsequent requests might operate on outdated visitor data, leading to inconsistent or stale flag evaluations. For more information, please refers to our [JS SDK documentation](https://docs.developers.flagship.io/docs/javascript#/).
 
 An example of this implementation
 
