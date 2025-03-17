@@ -15,6 +15,7 @@ This Provider allow the use of OpenFeature with AB Tasty Feature experimentation
 - Carry out A/B tests by easily assigning feature variations to groups of users.
 
 👉 Get started: https://docs.developers.flagship.io/docs/getting-started-with-flagship#/
+
 👉 AB Tasty FE&R SDK Key feature: https://docs.developers.flagship.io/docs/key-features#/
 
 ## Getting started
