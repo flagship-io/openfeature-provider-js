@@ -18,6 +18,8 @@ This Provider allow the use of OpenFeature with AB Tasty Feature experimentation
 
 👉 AB Tasty FE&R SDK Key feature: https://docs.developers.flagship.io/docs/key-features#/
 
+👉 AB Tasty OpenFeature Integration: https://docs.developers.flagship.io/docs/openfeature-overview#/
+
 ## Getting started
 
 Below is a simple example that describes the instantiation of the AB Tasty Provider. Please see the [OpenFeature Documentation](https://docs.openfeature.dev/docs/reference/concepts/evaluation-api) for details on how to use the OpenFeature SDK.
